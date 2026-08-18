@@ -1,5 +1,6 @@
 package com.pedrin.api_github_analyzer.controller;
 
+import com.pedrin.api_github_analyzer.client.dto.GithubListRepoDTO;
 import com.pedrin.api_github_analyzer.client.dto.GithubUserDTO;
 import com.pedrin.api_github_analyzer.service.GithubService;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/analyzer")
@@ -19,6 +22,12 @@ public class GithubController {
     @GetMapping("/user")
     public ResponseEntity<GithubUserDTO> getUser(@RequestParam String username){
         var dto = service.getUser(username);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/repos")
+    public ResponseEntity<List<GithubListRepoDTO>> getRepos(@RequestParam String username){
+        var dto = service.getRepos(username);
         return ResponseEntity.ok(dto);
     }
 }
