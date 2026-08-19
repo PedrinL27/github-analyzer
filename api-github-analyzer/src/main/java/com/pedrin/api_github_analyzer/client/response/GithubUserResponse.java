@@ -1,6 +1,6 @@
-package com.pedrin.api_github_analyzer.client.dto;
+package com.pedrin.api_github_analyzer.client.response;
 
-public record GithubUserDTO(
+public record GithubUserResponse(
         String login,
         String avatar_url,
         String name,
