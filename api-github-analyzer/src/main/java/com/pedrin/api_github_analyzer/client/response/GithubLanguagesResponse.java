@@ -6,6 +6,7 @@ public record GithubLanguagesResponse(
         String name,
         String html_url,
         String description,
-        Map<String, Integer> languages
+        Map<String, Integer> languages,
+        Integer score
 ) {
 }

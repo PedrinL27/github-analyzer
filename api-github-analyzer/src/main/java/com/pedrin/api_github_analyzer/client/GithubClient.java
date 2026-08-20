@@ -21,7 +21,7 @@ public interface GithubClient {
             @PathVariable String username
     );
 
-    @GetMapping("/users/{username}/repos?per_page=10&sort=updated")
+    @GetMapping("/users/{username}/repos")
     List<GithubRepoResponse> getRepos(
             @PathVariable String username,
             @RequestParam("per_page") int perPage,

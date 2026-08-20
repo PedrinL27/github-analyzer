@@ -32,12 +32,4 @@ public class GithubController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/repos/languages")
-    public ResponseEntity<Map<String, Integer>> getLanguages(
-            @RequestParam String username,
-            @RequestParam String repo){
-        var response = service.getLanguages(username, repo);
-        return ResponseEntity.ok(response);
-    }
-
 }
