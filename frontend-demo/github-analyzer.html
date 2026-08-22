@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gh-analyzer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<style>
+  :root {
+    --paper: #f6f5f0;
+    --ink: #1c1c1a;
+    --ink-soft: #57564f;
+    --line: #d8d6cc;
+    --add: #1a7f37;
+    --add-bg: #dafbe1;
+    --del: #cf222e;
+    --del-bg: #ffebe9;
+    --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px;
+  }
+
+  main {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .prompt-line {
+    color: var(--ink-soft);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 28px 0;
+    letter-spacing: -0.01em;
+  }
+
+  h1 .cursor {
+    display: inline-block;
+    width: 9px;
+    height: 20px;
+    background: var(--ink);
+    margin-left: 6px;
+    vertical-align: -3px;
+    animation: blink 1.1s step-end infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  form {
+    display: flex;
+    border: 1.5px solid var(--ink);
+    background: #fff;
+  }
+
+  .at {
+    padding: 14px 4px 14px 16px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    user-select: none;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 14px 8px;
+    font-family: var(--mono);
+    font-size: 15px;
+    background: transparent;
+    color: var(--ink);
+    min-width: 0;
+  }
+
+  input[type="text"]::placeholder { color: #b9b7ac; }
+
+  button {
+    border: none;
+    border-left: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 22px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  button:hover:not(:disabled) { background: #3a3a35; }
+  button:disabled { cursor: default; opacity: 0.6; }
+
+  #status {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-soft);
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+  #result {
+    margin-top: 28px;
+  }
+
+  .card {
+    border: 1.5px solid var(--line);
+    background: #fff;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1.5px solid var(--line);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .card-head .badge {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .badge.ok { color: var(--add); }
+  .badge.err { color: var(--del); }
+
+  .card-body {
+    padding: 18px 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .card-body.error {
+    background: var(--del-bg);
+    color: #7a1c22;
+  }
+
+  .card-body.ok-bg {
+    background: var(--add-bg);
+  }
+
+  .card-body.markdown {
+    white-space: normal;
+  }
+
+  .card-body.markdown h1,
+  .card-body.markdown h2,
+  .card-body.markdown h3 {
+    font-family: var(--mono);
+    margin: 18px 0 8px;
+    line-height: 1.3;
+  }
+
+  .card-body.markdown h1:first-child,
+  .card-body.markdown h2:first-child,
+  .card-body.markdown h3:first-child {
+    margin-top: 0;
+  }
+
+  .card-body.markdown h1 { font-size: 18px; }
+  .card-body.markdown h2 { font-size: 16px; }
+  .card-body.markdown h3 { font-size: 14px; color: var(--ink-soft); }
+
+  .card-body.markdown p {
+    margin: 0 0 12px;
+  }
+
+  .card-body.markdown ul,
+  .card-body.markdown ol {
+    margin: 0 0 12px;
+    padding-left: 20px;
+  }
+
+  .card-body.markdown li {
+    margin-bottom: 4px;
+  }
+
+  .card-body.markdown strong { font-weight: 700; }
+  .card-body.markdown em { font-style: italic; }
+
+  .card-body.markdown code {
+    font-family: var(--mono);
+    background: rgba(0,0,0,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  .card-body.markdown pre {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 14px;
+    overflow-x: auto;
+    margin: 0 0 12px;
+    border-radius: 3px;
+  }
+
+  .card-body.markdown pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  .card-body.markdown blockquote {
+    margin: 0 0 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--line);
+    color: var(--ink-soft);
+  }
+
+  .card-body.markdown a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+  }
+
+  .card-body.markdown hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 16px 0;
+  }
+
+  .card-body.markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 16px;
+    font-size: 13px;
+  }
+
+  .card-body.markdown th,
+  .card-body.markdown td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .card-body.markdown th {
+    background: #efeee6;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+
+  .card-body.markdown tr:nth-child(even) td {
+    background: #fbfaf6;
+  }
+
+  .card-body.markdown table + * {
+    margin-top: 0;
+  }
+
+  footer {
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <div class="prompt-line">~/analyzer</div>
+  <h1>gh-analyzer<span class="cursor"></span></h1>
+
+  <form id="form">
+    <span class="at">@</span>
+    <input type="text" id="username" placeholder="octocat" autocomplete="off" autofocus>
+    <button type="submit" id="submitBtn">analisar</button>
+  </form>
+
+  <div id="status" class="hidden"></div>
+
+  <div id="result"></div>
+
+  <footer>
+    GET /analyzer/ai/{username} · rodando em <span id="baseUrlLabel">http://localhost:8080</span>
+  </footer>
+</main>
+
+<script>
+  // Ajuste aqui se sua API não estiver em localhost:8080
+  const API_BASE = "http://localhost:8080";
+  document.getElementById("baseUrlLabel").textContent = API_BASE;
+
+  const form = document.getElementById("form");
+  const input = document.getElementById("username");
+  const submitBtn = document.getElementById("submitBtn");
+  const statusEl = document.getElementById("status");
+  const resultEl = document.getElementById("result");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const username = input.value.trim();
+    if (!username) return;
+
+    setLoading(true);
+    resultEl.innerHTML = "";
+
+    try {
+      const res = await fetch(`${API_BASE}/analyzer/ai/${encodeURIComponent(username)}`);
+      const contentType = res.headers.get("content-type") || "";
+      const isJson = contentType.includes("application/json");
+      const data = isJson ? await res.json() : await res.text();
+
+      if (!res.ok) {
+        renderError(res.status, data);
+      } else {
+        renderSuccess(username, data);
+      }
+    } catch (err) {
+      renderError(null, { message: `Não consegui falar com a API: ${err.message}` });
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  function setLoading(isLoading) {
+    submitBtn.disabled = isLoading;
+    input.disabled = isLoading;
+    statusEl.classList.toggle("hidden", !isLoading);
+    statusEl.innerHTML = isLoading
+      ? `<span class="dot"></span> consultando a IA, pode levar alguns segundos...`
+      : "";
+  }
+
+  function renderSuccess(username, data) {
+    const text = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+    const html = window.marked ? marked.parse(text) : escapeHtml(text);
+    resultEl.innerHTML = `
+      <div class="card">
+        <div class="card-head">
+          <span>@${escapeHtml(username)}</span>
+          <span class="badge ok">200 OK</span>
+        </div>
+        <div class="card-body markdown">${html}</div>
+      </div>
+    `;
+  }
+
+  function renderError(status, data) {
+    const message = (data && (data.message || data.mensagem)) || (typeof data === "string" ? data : "Erro desconhecido");
+    resultEl.innerHTML = `
+      <div class="card">
+        <div class="card-head">
+          <span>erro</span>
+          <span class="badge err">${status ?? "network"}</span>
+        </div>
+        <div class="card-body error">${escapeHtml(message)}</div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+</body>
+</html>

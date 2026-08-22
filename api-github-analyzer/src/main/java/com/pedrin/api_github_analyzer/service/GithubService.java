@@ -1,10 +1,12 @@
 package com.pedrin.api_github_analyzer.service;
 
 import com.pedrin.api_github_analyzer.client.GithubClient;
+import com.pedrin.api_github_analyzer.client.exceptions.GithubUserNotFoundException;
 import com.pedrin.api_github_analyzer.client.response.GithubFileResponse;
 import com.pedrin.api_github_analyzer.client.response.GithubLanguagesResponse;
 import com.pedrin.api_github_analyzer.client.response.GithubRepoResponse;
 import com.pedrin.api_github_analyzer.client.response.GithubUserResponse;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,12 @@ public class GithubService {
     private final GithubClient client;
 
     public GithubUserResponse getUser(String username){
-        return client.getUser(username);
+        try {
+            return client.getUser(username);
+        } catch (FeignException.NotFound e) {
+            throw new GithubUserNotFoundException(username, e.status());
+        }
+
     }
 
     public List<GithubLanguagesResponse> getRepos(String username) {

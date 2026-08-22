@@ -5,6 +5,7 @@ import com.pedrin.api_github_analyzer.client.response.GithubLanguagesResponse;
 import com.pedrin.api_github_analyzer.client.response.GithubUserResponse;
 import com.pedrin.api_github_analyzer.service.GithubService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class GithubTools {
 
     private final GithubService githubService;
@@ -21,6 +23,7 @@ public class GithubTools {
             Use esta ferramenta para obter dados básicos do perfil antes de analisar seus repositórios.
             """)
     public GithubUserResponse getUser(String username) {
+        log.info("Acessado a tool getUser do seguinte usuario: {}", username);
         return githubService.getUser(username);
     }
 
@@ -32,6 +35,7 @@ public class GithubTools {
             Use esta ferramenta primeiro para identificar quais projetos merecem uma análise mais profunda.
             """)
     public List<GithubLanguagesResponse> getRepositories(String username) {
+        log.info("Acessado a tool getRepositories do seguinte usuario: {}", username);
         return githubService.getRepos(username);
     }
 
@@ -53,6 +57,7 @@ public class GithubTools {
             String repository,
             String path
     ) {
+        log.info("Acessado a tool getRepositoryContent do seguinte repository {} e no seguinte caminho {}", repository, path);
         return githubService.getContent(username, repository, path);
     }
 }

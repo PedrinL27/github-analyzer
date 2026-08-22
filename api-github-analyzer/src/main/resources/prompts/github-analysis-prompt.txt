@@ -1,0 +1,103 @@
+Analise o perfil do GitHub do usuário {username}.
+Utilize as ferramentas disponíveis para investigar o perfil e produzir uma
+análise técnica baseada exclusivamente nas evidências encontradas.
+
+FLUXO DE INVESTIGAÇÃO:
+
+1. Obtenha as informações do usuário.
+2. Obtenha os 10 repositórios mais relevantes fornecidos pela ferramenta,
+   considerando nome, descrição, linguagens, Activity Score e Popularity Score.
+3. Identifique quais repositórios possuem maior valor para compreender o
+   perfil técnico do desenvolvedor — não selecione apenas pelo maior score;
+   considere também o valor das evidências técnicas disponíveis.
+4. Explore os repositórios selecionados com a ferramenta de exploração de
+   arquivos, sempre começando pela raiz.
+
+Ao explorar um repositório:
+- Procure primeiro arquivos que revelem propósito e tecnologia: README.md,
+  pom.xml, package.json, requirements.txt, Dockerfile, docker-compose.yml,
+  arquivos de configuração, testes, documentação, diretórios de código-fonte
+  e workflows.
+- Não percorra recursivamente toda a árvore nem abra todos os diretórios de
+  código-fonte. Aprofunde só quando a estrutura já encontrada indicar que há
+  evidência relevante sobre arquitetura, tecnologias ou propósito do projeto.
+- Priorize obter informação relevante em poucas chamadas de ferramenta.
+
+INTERPRETAÇÃO DOS SCORES:
+
+- Activity Score reflete recência de atividade — score alto indica atividade
+  recente. Não interprete como frequência de commits, volume de trabalho ou
+  consistência de desenvolvimento sem evidência que sustente isso.
+- Popularity Score reflete sinais de reconhecimento externo. Score baixo não
+  indica baixa capacidade técnica — projetos pessoais, acadêmicos ou recentes
+  naturalmente têm pouca popularidade.
+- Nunca atribua causa a um score sem evidência suficiente. Quando uma
+  conclusão for apenas uma possibilidade, deixe isso explícito.
+
+REGRAS DE EVIDÊNCIA:
+
+Não invente tecnologias, experiências profissionais, conhecimentos,
+quantidade de commits, frequência de desenvolvimento, nível de senioridade,
+motivos para um score, ou qualquer característica não observável pelas
+ferramentas.
+
+Diferencie sempre:
+- FATO: informação diretamente observada nos dados ou na estrutura do projeto.
+- INTERPRETAÇÃO: conclusão obtida a partir de um ou mais fatos observados.
+
+Avalie o conjunto dos projetos e procure padrões — concentração ou
+diversidade de tecnologias, tipos de aplicação, complexidade aparente,
+organização, arquitetura, documentação, testes, integração entre sistemas,
+uso de infraestrutura, e evolução ou consistência tecnológica entre projetos
+— em vez de avaliar um projeto isoladamente.
+
+Não atribua uma nota geral de capacidade técnica. O objetivo é um retrato
+técnico contextualizado, não uma avaliação definitiva de competência
+profissional. Considere que o perfil pode pertencer a alguém em início de
+carreira, e não o compare com desenvolvedores experientes usando apenas
+métricas de popularidade ou quantidade de projetos.
+
+ESTRUTURA DA ANÁLISE (Markdown):
+
+## Visão geral do perfil
+Síntese objetiva do perfil e principais padrões identificados.
+
+## Principais tecnologias
+Linguagens, frameworks e bibliotecas efetivamente identificadas, e como
+aparecem nos projetos.
+
+## Projetos mais relevantes
+Para cada projeto selecionado: objetivo aparente, tecnologias identificadas,
+características técnicas relevantes, Activity Score, Popularity Score e
+evidências encontradas na estrutura do projeto.
+
+## Atividade
+Atividade recente observada nos Activity Scores, distinguindo claramente do
+que não pode ser presumido (frequência ou consistência) sem evidência.
+
+## Popularidade
+O que os Popularity Scores permitem concluir — e o que NÃO permitem concluir
+— sobre capacidade técnica.
+
+## Perfil técnico
+Áreas técnicas, padrões de arquitetura, tipos de aplicação, tecnologias
+recorrentes, complexidade aparente e sinais de evolução técnica (quando
+houver evidência). Toda conclusão deve estar ligada a evidências observadas.
+
+## Pontos positivos
+Principais pontos positivos e a evidência que sustenta cada um.
+
+## Pontos de desenvolvimento
+Possíveis áreas de desenvolvimento, relacionadas ao objetivo aparente do
+perfil e às evidências encontradas — ausência de uma tecnologia não é
+deficiência automática.
+
+## Conclusão
+Foco técnico principal, sinais mais relevantes, principais pontos fortes e
+possíveis próximos passos. Não transforme em avaliação definitiva de
+competência profissional.
+
+FORMATO:
+Markdown. Use tabelas para comparar repositórios quando útil. Evite repetir
+informações entre seções. Priorize evidências concretas em vez de
+generalizações.
