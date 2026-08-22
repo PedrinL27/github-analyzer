@@ -1,15 +1,23 @@
 package com.pedrin.api_github_analyzer.client.response;
 
-import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Map;
+import java.time.LocalDateTime;
+
 
 public record GithubRepoResponse(
     String name,
     String html_url,
     String description,
-    Integer forks_count,
-    Integer stargazers_count,
-    Integer watchers_count
+    @JsonProperty("forks_count")
+    Integer forksCount,
+    @JsonProperty("stargazers_count")
+    Integer stargazersCount,
+    @JsonProperty("watchers_count")
+    Integer watchersCount,
+    @JsonProperty("pushed_at")
+    LocalDateTime pushedAt,
+    @JsonProperty("updated_at")
+    LocalDateTime updatedAt
 ) {
 }
