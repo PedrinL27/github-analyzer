@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,7 +58,7 @@ public class GithubController {
         return ResponseEntity.ok(service.getContent(username, repo, path));
     }
 
-    @GetMapping("/ai/{username}")
+    @GetMapping(value = "/ai/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> analyzeGithub(@PathVariable String username) {
         try {
             service.getUser(username);

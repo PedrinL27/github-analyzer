@@ -4,7 +4,10 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
-
+      timeout: 240s
+      chat:
+        response-format:
+          type: JSON_OBJECT
 github:
   api:
     token: ${GITHUB_API_KEY}

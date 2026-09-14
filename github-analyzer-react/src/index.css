@@ -1,0 +1,198 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  background: #0d1d1b;
+  color: #e6f2ee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: #0d1d1b;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% -24%, rgba(47, 104, 95, 0.48), transparent 42rem),
+    radial-gradient(circle at 0% 75%, rgba(31, 70, 65, 0.3), transparent 29rem),
+    #0d1d1b;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.font-serif {
+  font-family: "DM Serif Display", Georgia, serif !important;
+}
+
+::selection {
+  background: rgba(103, 164, 154, 0.28);
+}
+
+.markdown {
+  line-height: 1.75;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin: 1.5rem 0 0.65rem;
+  font-weight: 650;
+  color: #1d3632;
+}
+
+.markdown h1 { font-size: 1.35rem; }
+.markdown h2 { font-size: 1.15rem; }
+.markdown h3 { font-size: 1rem; color: #31504a; }
+
+.markdown p {
+  margin: 0 0 1rem;
+  color: #526963;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+  color: #526963;
+}
+
+.markdown li {
+  margin-bottom: 0.35rem;
+}
+
+.markdown strong {
+  color: #1d3632;
+  font-weight: 650;
+}
+
+.markdown code {
+  border: 1px solid #d8e5e0;
+  border-radius: 0.4rem;
+  background: #edf5f2;
+  padding: 0.12rem 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.85em;
+  color: #216a64;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #d8e5e0;
+  border-radius: 0.75rem;
+  background: #193633;
+}
+
+.markdown pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #e8f4f0;
+}
+
+.markdown a {
+  color: #24746d;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.markdown blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid #3f9089;
+  color: #617a73;
+}
+
+.markdown hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #d8e5e0;
+}
+
+.markdown table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid #d8e5e0;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown th {
+  background: #eef5f2;
+  color: #1d3632;
+}
+
+.markdown td {
+  color: #526963;
+}
+
+.markdown tr:nth-child(even) td {
+  background: #f8fbfa;
+}
+
+/* A área de resultado usa superfícies escuras e densas, preservando leitura. */
+.analysis-result {
+  background: #142a27 !important;
+  border-color: #35564f !important;
+}
+
+.analysis-result [class*="bg-[#"],
+.analysis-result .bg-white {
+  background-color: #193431 !important;
+}
+
+.analysis-result [class*="border-[#"] {
+  border-color: #31534d !important;
+}
+
+.analysis-result [class*="text-[#"] {
+  color: #dcece7 !important;
+}
+
+.analysis-result .score-fill {
+  background-color: #78bdb2 !important;
+}
+
+.analysis-result .bg-\[\#fff9e8\] {
+  background-color: #3b3421 !important;
+}
+
+.analysis-error {
+  background: #332321 !important;
+  border-color: #744940 !important;
+}
+
+.analysis-error [class*="border-[#"] {
+  border-color: #67423c !important;
+}
+
+.analysis-error [class*="bg-[#"] {
+  background-color: #442a27 !important;
+}
+
+.analysis-error [class*="text-[#"] {
+  color: #f0d9d5 !important;
+}
