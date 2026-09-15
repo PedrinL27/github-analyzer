@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/analyzer")
@@ -60,31 +61,43 @@ public class GithubController {
 
     @GetMapping(value = "/ai/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> analyzeGithub(@PathVariable String username) {
-        try {
-            service.getUser(username);
-        } catch (GithubUserNotFoundException e) {
-            log.warn("GitHub user not found: {}", username);
-            return ResponseEntity.status(HttpStatusCode.valueOf(e.getStatusCode()))
-                    .body(new UserNotFoundExceptionDTO(e.getMessage(), e.getStatusCode()));
-        }
+        String mockup = service.checkMockup(username);
+        if (mockup == null) {
+            try {
+                service.getUser(username);
+            } catch (GithubUserNotFoundException e) {
+                log.warn("GitHub user not found: {}", username);
+                return ResponseEntity.status(HttpStatusCode.valueOf(e.getStatusCode()))
+                        .body(new UserNotFoundExceptionDTO(e.getMessage(), e.getStatusCode()));
+            }
 
-        try {
-            Prompt prompt = analysisPrompt.create(username);
+            try {
+                Prompt prompt = analysisPrompt.create(username);
 
-            String response = chatClientBuilder.build()
-                    .prompt(prompt)
-                    .tools(tools)
-                    .call()
-                    .content();
+                String response = chatClientBuilder.build()
+                        .prompt(prompt)
+                        .tools(tools)
+                        .call()
+                        .content();
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            log.error("Error while analyzing GitHub user {}", username, e);
-            return ResponseEntity.status(HttpStatusCode.valueOf(502))
-                    .body(new UserNotFoundExceptionDTO(
-                            "Failed to analyze user via AI: " + e.getMessage(),
-                            502
-                    ));
+                log.info(response);
+                return ResponseEntity.ok(response);
+            } catch (Exception e) {
+                log.error("Error while analyzing GitHub user {}", username, e);
+                return ResponseEntity.status(HttpStatusCode.valueOf(502))
+                        .body(new UserNotFoundExceptionDTO(
+                                "Failed to analyze user via AI: " + e.getMessage(),
+                                502
+                        ));
+            }
+        } else {
+            try {
+                TimeUnit.SECONDS.sleep(15); // So pra dar aquela impressao que ta fazendo algo importante
+                return ResponseEntity.ok(mockup);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return ResponseEntity.badRequest().build();
+            }
         }
     }
 

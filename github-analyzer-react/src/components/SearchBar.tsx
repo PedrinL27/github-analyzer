@@ -52,7 +52,7 @@ export function SearchBar({
 
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-[#90a39d]">
         <span>Experimente:</span>
-        {["octocat", "torvalds", "facebook"].map((example) => (
+        {["torvalds", "ahejlsberg", "akitaonrails"].map((example) => (
           <button
             key={example}
             type="button"

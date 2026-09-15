@@ -54,6 +54,8 @@ export type Analysis = {
     name: string | null;
     bio: string | null;
     avatarUrl: string | null;
+    // O prompt agora garante que profileUrl é sempre derivado de username,
+    // mas mantemos nullable por segurança com respostas antigas/legadas.
     profileUrl: string | null;
   };
 
@@ -109,6 +111,11 @@ type Props = {
   data: Analysis;
 };
 
+// Ambos os scores vêm da mesma ferramenta e usam a mesma escala 0–10
+// (ver exemplos: activityScore 8.28/7.83/8.8, popularityScore 0/9).
+// Mantemos essa constante única para não deixar as duas barras dessincronizarem de novo.
+const SCORE_SCALE_MAX = 10;
+
 const confidenceStyles: Record<Confidence, string> = {
   HIGH: "border-[#9bcfc0] bg-[#e5f4ed] text-[#20735d]",
   MEDIUM: "border-[#ead79b] bg-[#fff7db] text-[#8b671d]",
@@ -116,24 +123,26 @@ const confidenceStyles: Record<Confidence, string> = {
 };
 
 function ConfidenceBadge({ value }: { value: Confidence }) {
+  const style = confidenceStyles[value] ?? confidenceStyles.LOW;
+
   return (
     <span
-      className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold tracking-wider ${confidenceStyles[value]}`}
+      className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold tracking-wider ${style}`}
     >
-      {value}
+      {value ?? "LOW"}
     </span>
   );
 }
 
 function ScoreBar({
   value,
-  max,
+  max = SCORE_SCALE_MAX,
 }: {
   value: number | null | undefined;
-  max: number;
+  max?: number;
 }) {
-  const safeValue = value ?? 0;
-  const percentage = max > 0 ? Math.min((safeValue / max) * 100, 100) : 0;
+  const safeValue = typeof value === "number" && !Number.isNaN(value) ? value : 0;
+  const percentage = max > 0 ? Math.min(Math.max((safeValue / max) * 100, 0), 100) : 0;
 
   return (
     <div className="h-1.5 overflow-hidden rounded-full bg-[#e3ebe7]">
@@ -204,21 +213,40 @@ function Section({
 }
 
 // Formata um score numérico com segurança, sem quebrar em null/undefined.
-function formatScore(
-  value: number | null | undefined,
-  formatter: (n: number) => string
-): string {
-  return typeof value === "number" ? formatter(value) : "—";
+// Usa sempre 2 casas decimais já que a escala é 0–10 para ambos os scores.
+function formatScore(value: number | null | undefined): string {
+  return typeof value === "number" && !Number.isNaN(value) ? value.toFixed(2) : "—";
 }
 
 export function AnalysisResult({ username, data }: Props) {
   const [copied, setCopied] = useState(false);
-  const profile = data.profile ?? {};
-  const summary = data.summary ?? {};
-  const technologies = data.technologies ?? {};
-  const activity = data.activity ?? { summary: "", observations: [], limitations: [] };
-  const popularity = data.popularity ?? { summary: "", observations: [], limitations: [] };
-  const repositories = Array.isArray(data.repositories) ? data.repositories : [];
+  const profile = data?.profile ?? {
+    username,
+    name: null,
+    bio: null,
+    avatarUrl: null,
+    profileUrl: null,
+  };
+  const summary = data?.summary ?? { headline: "", description: "", confidence: "LOW" as Confidence };
+  const technologies = data?.technologies ?? {
+    languages: [],
+    frameworks: [],
+    libraries: [],
+    tools: [],
+    infrastructure: [],
+  };
+  const activity = data?.activity ?? { summary: "", observations: [], limitations: [] };
+  const popularity = data?.popularity ?? { summary: "", observations: [], limitations: [] };
+  const repositories = Array.isArray(data?.repositories) ? data.repositories : [];
+  const technicalAreas = Array.isArray(data?.technicalAreas) ? data.technicalAreas : [];
+  const strengths = Array.isArray(data?.strengths) ? data.strengths : [];
+  const developmentAreas = Array.isArray(data?.developmentAreas) ? data.developmentAreas : [];
+  const limitations = Array.isArray(data?.limitations) ? data.limitations : [];
+
+  // Fallback determinístico caso a API não tenha preenchido profileUrl
+  // (o prompt manda sempre construir a partir do username, mas o front
+  // fica resiliente a respostas antigas que ainda retornem null).
+  const profileUrl = profile.profileUrl || (profile.username || username ? `https://github.com/${profile.username || username}` : null);
 
   async function copyResult() {
     await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -227,11 +255,6 @@ export function AnalysisResult({ username, data }: Props) {
 
     window.setTimeout(() => setCopied(false), 1400);
   }
-
-  const maxPopularity = Math.max(
-    ...repositories.map((r) => r.popularityScore ?? 0),
-    1
-  );
 
   return (
     <section className="analysis-result overflow-hidden rounded-2xl border border-[#d8e4df] bg-white shadow-[0_18px_45px_rgba(0,0,0,0.22)]">
@@ -302,9 +325,9 @@ export function AnalysisResult({ username, data }: Props) {
             )}
           </div>
 
-          {profile.profileUrl && (
+          {profileUrl && (
             <a
-              href={profile.profileUrl}
+              href={profileUrl}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-2 rounded-lg border border-[#d7e3df] px-3 py-2 text-xs text-[#55736c] transition hover:bg-[#edf5f2] hover:text-[#245e59]"
@@ -336,10 +359,10 @@ export function AnalysisResult({ username, data }: Props) {
       </div>
 
       {/* Technical Areas */}
-      {data.technicalAreas?.length > 0 && (
+      {technicalAreas.length > 0 && (
         <Section title="Áreas de experiência" icon={<Terminal size={16} />}>
           <div className="grid gap-3 md:grid-cols-2">
-            {data.technicalAreas.map((area, areaIndex) => (
+            {technicalAreas.map((area, areaIndex) => (
               <div
                 key={`${area.name}-${areaIndex}`}
                 className="rounded-xl border border-[#dce7e3] bg-[#fbfdfc] p-4"
@@ -450,6 +473,8 @@ export function AnalysisResult({ username, data }: Props) {
                 </div>
               )}
 
+              {/* Ambas as barras usam a mesma escala 0-10 (SCORE_SCALE_MAX),
+                  já que os dois scores vêm da mesma ferramenta com a mesma unidade. */}
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <div>
                   <div className="mb-2 flex justify-between">
@@ -458,11 +483,11 @@ export function AnalysisResult({ username, data }: Props) {
                     </span>
 
                     <span className="text-[10px] font-medium text-[#52716a]">
-                      {formatScore(repo.activityScore, (n) => n.toFixed(2))}
+                      {formatScore(repo.activityScore)}
                     </span>
                   </div>
 
-                  <ScoreBar value={repo.activityScore} max={10} />
+                  <ScoreBar value={repo.activityScore} />
                 </div>
 
                 <div>
@@ -472,13 +497,11 @@ export function AnalysisResult({ username, data }: Props) {
                     </span>
 
                     <span className="text-[10px] font-medium text-[#52716a]">
-                      {formatScore(repo.popularityScore, (n) =>
-                        n.toLocaleString()
-                      )}
+                      {formatScore(repo.popularityScore)}
                     </span>
                   </div>
 
-                  <ScoreBar value={repo.popularityScore} max={maxPopularity} />
+                  <ScoreBar value={repo.popularityScore} />
                 </div>
               </div>
 
@@ -628,10 +651,10 @@ export function AnalysisResult({ username, data }: Props) {
       </Section>
 
       {/* Strengths */}
-      {data.strengths?.length > 0 && (
+      {strengths.length > 0 && (
         <Section title="Pontos fortes" icon={<Trophy size={16} />}>
           <div className="grid gap-3 md:grid-cols-2">
-            {data.strengths.map((item, itemIndex) => (
+            {strengths.map((item, itemIndex) => (
               <div
                 key={itemIndex}
                 className="rounded-xl border border-[#cde6db] bg-[#f2faf6] p-4"
@@ -664,10 +687,10 @@ export function AnalysisResult({ username, data }: Props) {
       )}
 
       {/* Development Areas */}
-      {data.developmentAreas?.length > 0 && (
+      {developmentAreas.length > 0 && (
         <Section title="Oportunidades de desenvolvimento" icon={<Info size={16} />}>
           <div className="grid gap-3 md:grid-cols-2">
-            {data.developmentAreas.map((item, itemIndex) => (
+            {developmentAreas.map((item, itemIndex) => (
               <div
                 key={itemIndex}
                 className="rounded-xl border border-[#dce7e3] bg-[#fbfdfc] p-4"
@@ -700,11 +723,11 @@ export function AnalysisResult({ username, data }: Props) {
       )}
 
       {/* Limitations */}
-      {data.limitations?.length > 0 && (
+      {limitations.length > 0 && (
         <Section title="Limitações da análise" icon={<ShieldAlert size={16} />}>
           <div className="rounded-xl border border-[#eadfae] bg-[#fff9e8] p-4">
             <ul className="space-y-2">
-              {data.limitations.map((limitation, index) => (
+              {limitations.map((limitation, index) => (
                 <li key={index} className="text-xs leading-5 text-[#7b7155]">
                   • {limitation}
                 </li>
