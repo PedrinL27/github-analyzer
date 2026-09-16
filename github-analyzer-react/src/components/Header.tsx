@@ -14,9 +14,7 @@ export function Header() {
           <p className="text-[10px] font-bold tracking-wide text-[#90a59e]">PERFIS & REPOSITÓRIOS</p>
         </div>
       </div>
-      <span className="hidden rounded-full border border-[#31534e] bg-[#172f2c] px-3 py-1 text-[11px] font-semibold text-[#a9c9c2] sm:block">
-        Análise de perfil
-      </span>
+
     </header>
   );
 }

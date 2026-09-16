@@ -353,7 +353,7 @@ export function AnalysisResult({ username, data }: Props) {
           {summary.headline || "Panorama do perfil"}
         </h2>
 
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-[#526c65]">
+        <p className="mt-3 max-w-5xl text-sm leading-7 text-[#526c65]">
           {summary.description || "Os dados disponíveis deste perfil foram organizados abaixo."}
         </p>
       </div>

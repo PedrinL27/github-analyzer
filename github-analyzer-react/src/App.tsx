@@ -171,19 +171,15 @@ export default function App() {
   return (
     <AppErrorBoundary>
     <main className="min-h-screen">
-      <div className="mx-auto w-full max-w-5xl px-5 py-6 sm:px-8 sm:py-9">
+      <div className="mx-auto w-full max-w-5xl px-10 py-6 sm:px-8 sm:py-9">
         <Header />
 
-        <section className="mx-auto max-w-3xl pb-14 pt-16 text-center sm:pt-24">
+        <section className="mx-auto max-w-5xl pb-14 pt-16 text-center sm:pt-24">
           <h1 className="text-balance font-serif text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-[#edf6f3] sm:text-7xl">
-            Conheça melhor quem
-            <span className="block text-[#83c9bc]">constrói no GitHub.</span>
+            Descubra seu
+            <span className="block text-[#83c9bc]">seu GitHub.</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[#a8bbb5] sm:text-lg">
-            Repositórios, experiência e padrões de desenvolvimento organizados
-            em uma leitura simples e útil.
-          </p>
 
           <div className="mt-9 text-left">
             <SearchBar
@@ -195,7 +191,7 @@ export default function App() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl">
+        <section className="mx-auto max-w-5xl">
           {result.type === "loading" && (
             <LoadingAnalysis username={result.username} />
           )}
